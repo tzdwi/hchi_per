@@ -5,12 +5,14 @@ Author: Trevor Dorn-Wallenstein
 Date: 2/7/18
 """
 
+import numpy as np
 import pydis
 from pydis.wrappers import _WriteSpec as WriteSpec
-import numpy as np
+import os
 from glob import glob
 from astropy.io import fits
 from os import remove
+from matplotlib import pyplot as plt, cm
 
 data_dir = '../data/1_25_18/Q1UW03/UT180126/'
 
@@ -34,8 +36,8 @@ bsensfunc = np.genfromtxt(data_dir+'SENS_B.txt')
 rsensfunc = np.genfromtxt(data_dir+'SENS_R.txt')
 
 #wavelength array from sensfunc calculation
-bwfitstd = np.genfromtxt(data_dir+'WFITSTD_B.txt')
-rwfitstd = np.genfromtxt(data_dir+'WFITSTD_B.txt')
+bwfinalstd = np.genfromtxt(data_dir+'WFINALSTD_B.txt')
+rwfinalstd = np.genfromtxt(data_dir+'WFINALSTD_B.txt')
 
 print('Loaded calibration data')
 
@@ -56,14 +58,14 @@ for file in fitsfiles:
             fmask_out = bfmask_out
             wfit = bwfit
             sensfunc = bsensfunc
-            wfitstd = bwfitstd
+            wfinalstd = bwfinalstd
         elif col == 'r':
             bias = rbias
             flat = rflat
             fmask_out = rfmask_out
             wfit = rwfit
             sensfunc = rsensfunc
-            wfitstd = rwfitstd
+            wfinalstd = rwfinalstd
         else:
             print('something went wrong with file parsing')
             break
@@ -134,3 +136,6 @@ for file in fitsfiles:
         WriteSpec(file+'.raw', wfinal, flux, fluxerr, trace)
         os.remove(file+'.raw.trace')
         WriteSpec(file, wfinal, ffinal, efinal, trace)
+        
+        plt.plot(wfinal,flux)
+        plt.show()
